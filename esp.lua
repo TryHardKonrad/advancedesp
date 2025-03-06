@@ -148,16 +148,28 @@ espConnection = RunService.RenderStepped:Connect(function()
     local localRoot = localChar and localChar:FindFirstChild("HumanoidRootPart")
     local localPos = localRoot and localRoot.Position
     local localScreenPos = localPos and Workspace.CurrentCamera:WorldToViewportPoint(localPos)
+    local camera = Workspace.CurrentCamera
 
     for model, box in pairs(boxes) do
         if model and model:FindFirstChild("HumanoidRootPart") and model:FindFirstChild("Humanoid") and localPos and localScreenPos then
             local hrp = model.HumanoidRootPart
             local humanoid = model.Humanoid
-            local pos, onScreen = Workspace.CurrentCamera:WorldToViewportPoint(hrp.Position)
+            local pos, onScreen = camera:WorldToViewportPoint(hrp.Position)
             local studDistance = math.floor((localPos - hrp.Position).Magnitude)
             local isLocalPlayer = (model == LocalPlayer.Character)
 
-            if studDistance <= maxDistance or isLocalPlayer then
+            -- Snapline widoczne zawsze w granicach maxDistance (360 stopni)
+            if tracers[model] and studDistance <= maxDistance then
+                local tracer = tracers[model]
+                tracer.From = Vector2.new(localScreenPos.X, localScreenPos.Y)
+                tracer.To = Vector2.new(pos.X, pos.Y)
+                tracer.Visible = true
+            elseif tracers[model] then
+                tracers[model].Visible = false
+            end
+
+            -- ESP widoczne tylko gdy gracz jest na ekranie
+            if studDistance <= maxDistance and onScreen then
                 -- Ramka
                 box.Position = Vector2.new(pos.X - 20, pos.Y - 40)
                 box.Size = Vector2.new(40, 80)
@@ -189,14 +201,6 @@ espConnection = RunService.RenderStepped:Connect(function()
                 distance.Position = Vector2.new(pos.X, pos.Y + 45)
                 distance.Visible = not isLocalPlayer
 
-                -- Linia śledząca (tylko dla innych)
-                if tracers[model] then
-                    local tracer = tracers[model]
-                    tracer.From = Vector2.new(localScreenPos.X, localScreenPos.Y)
-                    tracer.To = Vector2.new(pos.X, pos.Y)
-                    tracer.Visible = true
-                end
-
                 -- Aktualizacja szkieletu
                 local skeletonLines = skeletons[model]
                 if skeletonLines then
@@ -205,23 +209,23 @@ espConnection = RunService.RenderStepped:Connect(function()
                         local part1 = model:FindFirstChild(part1Name)
                         local part2 = model:FindFirstChild(part2Name)
                         if part1 and part2 then
-                            local pos1 = Workspace.CurrentCamera:WorldToViewportPoint(part1.Position)
-                            local pos2 = Workspace.CurrentCamera:WorldToViewportPoint(part2.Position)
+                            local pos1 = camera:WorldToViewportPoint(part1.Position)
+                            local pos2 = camera:WorldToViewportPoint(part2.Position)
                             line.From = Vector2.new(pos1.X, pos1.Y)
                             line.To = Vector2.new(pos2.X, pos2.Y)
-                            line.Visible = onScreen
+                            line.Visible = true
                         else
                             line.Visible = false
                         end
                     end
                 end
             else
+                -- Wyłącz ESP gdy gracz nie jest na ekranie
                 box.Visible = false
                 healthbars[model].Visible = false
                 healthbarBorders[model].Visible = false
                 names[model].Visible = false
                 distances[model].Visible = false
-                if tracers[model] then tracers[model].Visible = false end
                 if skeletons[model] then
                     for _, line in pairs(skeletons[model]) do
                         line.Visible = false
