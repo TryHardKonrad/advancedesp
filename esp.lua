@@ -10,7 +10,7 @@ local healthbarBorders = {} -- Ramki dla pasków zdrowia
 local names = {}
 local distances = {}
 local tracers = {} -- Linie śledzące
-local maxDistance = 750
+local maxDistance = 999
 local updateInterval = 0.1
 
 -- Stałe kolory
@@ -19,7 +19,7 @@ local TRACER_COLOR = Color3.fromRGB(255, 255, 255) -- Biały dla linii śledząc
 local HEALTHBAR_COLOR = Color3.fromRGB(255, 0, 0) -- Czerwony dla paska zdrowia
 
 -- Informacja o uruchomieniu
-print("Skrypt ESP został uruchomiony! Naciśnij 'R', aby wyłączyć ESP.")
+print("Skrypt ESP został uruchomiony! Naciśnij 'P', aby wyłączyć ESP.")
 
 -- Inicjalizacja ESP
 for _, obj in pairs(Workspace:GetDescendants()) do
