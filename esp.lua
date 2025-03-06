@@ -24,7 +24,7 @@ local LOCAL_SKELETON_COLOR = Color3.fromRGB(0, 0, 255) -- Niebieski dla szkielet
 
 -- Informacja o uruchomieniu
 print("Skrypt ESP został uruchomiony! Naciśnij 'P', aby wyłączyć ESP.")
-print("Wersja 1.0.4")
+print("Wersja 1.0.5")
 
 -- Funkcja określająca typ modelu (R6 lub R15)
 local function getSkeletonParts(model)
@@ -141,6 +141,7 @@ for _, obj in pairs(Workspace:GetDescendants()) do
 end
 
 -- Główna pętla aktualizacji
+-- Główna pętla aktualizacji
 local espConnection
 espConnection = RunService.RenderStepped:Connect(function()
     task.wait(updateInterval)
@@ -158,6 +159,13 @@ espConnection = RunService.RenderStepped:Connect(function()
             local studDistance = math.floor((localPos - hrp.Position).Magnitude)
             local isLocalPlayer = (model == LocalPlayer.Character)
 
+            -- Sprawdzenie, czy gracz jest w polu widzenia kamery
+            local cameraCFrame = camera.CFrame
+            local vectorToPlayer = (hrp.Position - cameraCFrame.Position).Unit
+            local cameraLookVector = cameraCFrame.LookVector
+            local dotProduct = vectorToPlayer:Dot(cameraLookVector)
+            local isInFront = dotProduct > 0 -- Gracz jest przed kamerą, jeśli iloczyn skalarny > 0
+
             -- Snapline widoczne zawsze w granicach maxDistance (360 stopni)
             if tracers[model] and studDistance <= maxDistance then
                 local tracer = tracers[model]
@@ -168,8 +176,8 @@ espConnection = RunService.RenderStepped:Connect(function()
                 tracers[model].Visible = false
             end
 
-            -- ESP widoczne tylko gdy gracz jest na ekranie
-            if studDistance <= maxDistance and onScreen then
+            -- ESP widoczne tylko gdy gracz jest w polu widzenia i na ekranie
+            if studDistance <= maxDistance and onScreen and isInFront then
                 -- Ramka
                 box.Position = Vector2.new(pos.X - 20, pos.Y - 40)
                 box.Size = Vector2.new(40, 80)
@@ -220,7 +228,7 @@ espConnection = RunService.RenderStepped:Connect(function()
                     end
                 end
             else
-                -- Wyłącz ESP gdy gracz nie jest na ekranie
+                -- Wyłącz ESP gdy gracz nie jest w polu widzenia
                 box.Visible = false
                 healthbars[model].Visible = false
                 healthbarBorders[model].Visible = false
