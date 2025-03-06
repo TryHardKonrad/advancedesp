@@ -165,6 +165,11 @@ espConnection = RunService.RenderStepped:Connect(function()
             local dotProduct = vectorToPlayer:Dot(cameraLookVector)
             local isInFront = dotProduct > 0 -- Gracz jest przed kamerą, jeśli iloczyn skalarny > 0
 
+            -- Aktualizacja nazwy dynamicznie
+            local player = Players:GetPlayerFromCharacter(model)
+            local nickname = player and player.Name or "NPC"
+            names[model].Text = nickname -- Odświeżanie nazwy w każdej klatce
+
             -- ESP i snaplines widoczne tylko gdy gracz jest w polu widzenia i na ekranie
             if studDistance <= maxDistance and onScreen and isInFront then
                 -- Ramka
