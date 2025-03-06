@@ -11,7 +11,7 @@ local names = {}
 local distances = {}
 local tracers = {} -- Linie śledzące
 local skeletons = {} -- Linie szkieletu
-local maxDistance = 999
+local maxDistance = 2000
 local updateInterval = 0.1
 
 -- Stałe kolory
