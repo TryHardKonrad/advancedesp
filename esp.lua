@@ -24,6 +24,7 @@ local LOCAL_SKELETON_COLOR = Color3.fromRGB(0, 0, 255) -- Niebieski dla szkielet
 
 -- Informacja o uruchomieniu
 print("Skrypt ESP został uruchomiony! Naciśnij 'P', aby wyłączyć ESP.")
+print("Wersja 1.0.4")
 
 -- Funkcja określająca typ modelu (R6 lub R15)
 local function getSkeletonParts(model)
